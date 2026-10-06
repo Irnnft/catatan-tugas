@@ -4,6 +4,7 @@ import logo from '@/components/logo.jpg'
 export const metadata = {
   title: 'Kartu Tugas Planner',
   description: 'Aplikasi pencatat tugas kuliah offline, tanpa login, tersimpan di HP.',
+  manifest: '/manifest.json',
   icons: [{ rel: 'icon', url: logo.src }],
 }
 

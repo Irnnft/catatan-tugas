@@ -1,0 +1,17 @@
+{
+  "name": "Kartu Tugas Planner",
+  "short_name": "Kartu Tugas",
+  "description": "Aplikasi pencatat tugas kuliah offline",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf8ff",
+  "theme_color": "#3d6846",
+  "icons": [
+    {
+      "src": "/icon.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
