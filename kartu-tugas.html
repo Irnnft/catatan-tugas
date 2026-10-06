@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>Kartu Tugas Planner</title>
+  <meta name="description" content="Aplikasi pencatat tugas kuliah offline, tanpa login, tersimpan di HP."/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-tertiary-fixed": "#2d1602", "inverse-surface": "#2c3041", "surface-container-high": "#e4e7fe", "on-secondary-fixed": "#130d58", "tertiary": "#7a573c", "on-primary": "#ffffff", "surface-dim": "#d6d9ef", "surface-container-lowest": "#ffffff", "error-container": "#ffdad6", "inverse-on-surface": "#eff0ff", "secondary": "#58569e", "on-tertiary-fixed-variant": "#5f4026", "secondary-fixed-dim": "#c3c0ff", "outline": "#727970", "tertiary-fixed-dim": "#ebbe9c", "on-error": "#ffffff", "primary-fixed": "#bfeec3", "on-surface": "#171b2b", "on-tertiary-container": "#4c2f17", "on-background": "#171b2b", "surface-bright": "#faf8ff", "on-primary-container": "#133d20", "surface-tint": "#3d6846", "on-secondary": "#ffffff", "surface": "#faf8ff", "background": "#faf8ff", "on-primary-fixed": "#00210b", "primary-container": "#7ca982", "surface-container": "#ebedff", "on-surface-variant": "#414941", "on-secondary-fixed-variant": "#403e84", "secondary-fixed": "#e2dfff", "on-secondary-container": "#413f85", "outline-variant": "#c1c9bf", "tertiary-fixed": "#ffdcc3", "error": "#ba1a1a", "surface-container-low": "#f3f2ff", "tertiary-container": "#c09677", "primary": "#3d6846", "surface-container-highest": "#dee1f8", "surface-variant": "#dee1f8", "secondary-container": "#b0aefd", "primary-fixed-dim": "#a3d2a8", "on-primary-fixed-variant": "#254f30", "on-error-container": "#93000a", "inverse-primary": "#a3d2a8", "on-tertiary": "#ffffff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "margin": "1rem", "space-xl": "2rem", "space-md": "1rem", "space-xs": "0.25rem", "gutter": "1rem", "margin-desktop": "2.5rem", "gutter-desktop": "1.5rem", "margin-tablet": "1.5rem", "space-lg": "1.5rem", "gutter-tablet": "1.25rem", "space-sm": "0.5rem" }, "fontFamily": { "headline-xl-mobile": ["Plus Jakarta Sans"], "body-md": ["Inter"], "body-lg": ["Inter"], "body-sm": ["Inter"], "headline-xl": ["Plus Jakarta Sans"], "label-md": ["Inter"], "headline-lg": ["Plus Jakarta Sans"], "label-sm": ["Inter"], "headline-lg-mobile": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"] }, "fontSize": { "headline-xl-mobile": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.015em", "fontWeight": "700" }], "body-md": ["0.875rem", { "lineHeight": "1.45rem", "fontWeight": "400" }], "body-lg": ["1rem", { "lineHeight": "1.6rem", "fontWeight": "400" }], "body-sm": ["0.75rem", { "lineHeight": "1.25rem", "fontWeight": "400" }], "headline-xl": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-md": ["0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "0.01em", "fontWeight": "500" }], "headline-lg": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.015em", "fontWeight": "600" }], "label-sm": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.02em", "fontWeight": "600" }], "headline-lg-mobile": ["1.375rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-sm": ["1.125rem", { "lineHeight": "1.5rem", "fontWeight": "600" }], "headline-md": ["1.25rem", { "lineHeight": "1.625rem", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } };
+  </script>
+  <style>
+    @layer base {
+      html, body { width: 100vw; margin: 0; padding: 0; }
+      body { overscroll-behavior: none; min-height: max(884px, 100dvh); }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    .page { display: none; }
+    .page.active { display: flex; flex-direction: column; min-height: 100dvh; }
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .page.active { animation: fadeSlideIn 0.2s ease-out; }
+    /* Chart bar animation */
+    @keyframes growUp {
+      from { height: 0; }
+      to   { height: var(--target-h); }
+    }
+    .bar-anim { animation: growUp 0.6s ease-out forwards; }
+    /* Modal */
+    #confirm-modal { display: none; }
+    #confirm-modal.show { display: flex; }
+    /* Edit modal */
+    #edit-modal { display: none; }
+    #edit-modal.show { display: flex; }
+  </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface selection:bg-primary-fixed">
+
+<!-- ══════════════════════════════════════════
+     PAGE 1 — DAFTAR TUGAS
+══════════════════════════════════════════ -->
+<div class="page active" id="page-list">
+  <header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+    <div class="h-20 px-margin flex items-center justify-between">
+      <div class="flex items-center gap-space-sm">
+        <div class="w-11 h-11 rounded-xl bg-primary-fixed/60 flex items-center justify-center text-primary">
+          <span class="material-symbols-outlined text-[24px]">potted_plant</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-space-xs">
+            <span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Kartu Tugas</span>
+            <span class="px-space-xs py-0.5 rounded-full bg-secondary-fixed/50 text-on-secondary-fixed-variant font-label-sm text-[10px] leading-tight">Sem. Ganjil</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary-container inline-block"></span>
+            <span class="font-label-sm text-[11px] text-on-surface-variant font-normal">Lokal (Tanpa Login)</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-space-sm">
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex flex-col relative w-full px-margin pt-20 pb-28 bg-surface">
+    <div class="flex flex-col w-full gap-space-md">
+
+      <!-- Greeting & Stats -->
+      <section class="flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container-lowest shadow-sm relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-primary-fixed/30 pointer-events-none blur-xl"></div>
+        <div class="flex items-start justify-between">
+          <div class="flex flex-col">
+            <span class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Halo Mahasiswa! 👋</span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant">Yuk rapikan daftar target kuliahmu hari ini.</span>
+          </div>
+          <div class="flex items-center gap-1.5 px-space-sm py-1 rounded-full bg-primary-fixed/40 text-on-primary-container">
+            <span class="material-symbols-outlined text-[14px]">smartphone</span>
+            <span class="font-label-sm text-[11px]">HP Lokal</span>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-space-xs mt-space-xs">
+          <div class="flex flex-col items-center justify-center py-2 px-1 rounded-lg bg-surface-container-low text-center">
+            <span class="font-headline-sm text-headline-sm text-primary" id="stat-individu">0</span>
+            <span class="font-label-sm text-[11px] text-on-surface-variant">Individu</span>
+          </div>
+          <div class="flex flex-col items-center justify-center py-2 px-1 rounded-lg bg-secondary-fixed/40 text-center">
+            <span class="font-headline-sm text-headline-sm text-secondary" id="stat-kelompok">0</span>
+            <span class="font-label-sm text-[11px] text-on-secondary-container">Kelompok</span>
+          </div>
+          <div class="flex flex-col items-center justify-center py-2 px-1 rounded-lg bg-tertiary-fixed/60 text-center">
+            <span class="font-headline-sm text-headline-sm text-tertiary" id="stat-selesai">0</span>
+            <span class="font-label-sm text-[11px] text-on-tertiary-container">Selesai</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filter Tabs -->
+      <section class="flex flex-col gap-space-sm">
+        <div class="grid grid-cols-3 p-1 rounded-xl bg-surface-container-high text-center">
+          <button class="tab-btn active py-1.5 px-2 rounded-lg bg-surface-container-lowest text-primary font-label-md text-label-md shadow-sm transition-all" data-tab="all" type="button">Semua</button>
+          <button class="tab-btn py-1.5 px-2 rounded-lg text-on-surface-variant font-label-md text-label-md hover:text-on-surface transition-all" data-tab="individual" type="button">👤 Mandiri</button>
+          <button class="tab-btn py-1.5 px-2 rounded-lg text-on-surface-variant font-label-md text-label-md hover:text-on-surface transition-all" data-tab="group" type="button">👥 Tim</button>
+        </div>
+        <div class="flex items-center gap-space-xs">
+          <div class="flex-1 flex items-center gap-space-xs px-3 py-2 bg-surface-container-lowest rounded-xl shadow-sm">
+            <span class="material-symbols-outlined text-outline text-[18px]">search</span>
+            <input class="w-full bg-transparent text-on-surface placeholder:text-outline text-body-sm font-body-sm focus:outline-none" id="taskSearch" placeholder="Cari matkul atau tugas..." type="text"/>
+          </div>
+        </div>
+      </section>
+
+      <!-- Task Cards -->
+      <section class="flex flex-col gap-space-md" id="tasksList"></section>
+
+      <!-- Local Safety Note -->
+      <section class="flex items-center gap-space-sm p-space-sm rounded-xl bg-surface-container-low text-on-surface-variant">
+        <div class="w-8 h-8 rounded-lg bg-primary-fixed/40 flex items-center justify-center text-primary flex-shrink-0">
+          <span class="material-symbols-outlined text-[18px]">verified_user</span>
+        </div>
+        <p class="font-body-sm text-[12px] leading-snug">
+          <span class="font-semibold text-on-surface">Data Offline &amp; Privat:</span> Tugas tersimpan langsung di browser HP kamu tanpa perlu akun atau koneksi internet.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/85 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
+    <div class="h-16 px-margin flex items-center justify-around">
+      <button aria-current="page" class="min-w-[44px] min-h-[44px] flex flex-col items-center justify-center gap-0.5 transition-colors text-primary" onclick="showPage('list')" type="button">
+        <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1">task_alt</span>
+        <span class="font-label-sm text-label-sm">Daftar Tugas</span>
+      </button>
+      <button class="min-w-[44px] min-h-[44px] -mt-5 flex flex-col items-center justify-center gap-0.5 group" onclick="showPage('create')" type="button">
+        <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center shadow-[0_4px_12px_rgba(61,104,70,0.2)] text-on-primary group-hover:scale-105 transition-transform">
+          <span class="material-symbols-outlined text-[28px]">add</span>
+        </div>
+        <span class="font-label-sm text-label-sm text-on-surface-variant group-hover:text-primary transition-colors">Tambah</span>
+      </button>
+      <button class="min-w-[44px] min-h-[44px] flex flex-col items-center justify-center gap-0.5 text-on-surface-variant hover:text-primary transition-colors" onclick="showPage('stats')" type="button">
+        <span class="material-symbols-outlined text-[22px]">analytics</span>
+        <span class="font-label-sm text-label-sm">Arsip &amp; Statistik</span>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE 2 — TAMBAH TUGAS
+══════════════════════════════════════════ -->
+<div class="page" id="page-create">
+  <header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+    <div class="h-20 px-margin flex items-center justify-between">
+      <div class="flex items-center gap-space-sm">
+        <div class="w-11 h-11 rounded-xl bg-primary-fixed/60 flex items-center justify-center text-primary">
+          <span class="material-symbols-outlined text-[24px]">potted_plant</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-space-xs">
+            <span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Kartu Tugas</span>
+            <span class="px-space-xs py-0.5 rounded-full bg-secondary-fixed/50 text-on-secondary-fixed-variant font-label-sm text-[10px] leading-tight">Sem. Ganjil</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary-container inline-block"></span>
+            <span class="font-label-sm text-[11px] text-on-surface-variant font-normal">Lokal (Tanpa Login)</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-space-sm">
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex flex-col relative w-full px-margin pt-20 pb-28 bg-surface">
+    <div class="flex flex-col w-full gap-space-lg">
+
+      <!-- Banner -->
+      <div class="flex flex-col gap-space-xs relative overflow-hidden rounded-xl bg-surface-container-low p-space-md shadow-sm">
+        <div class="flex items-start justify-between">
+          <div class="flex flex-col gap-1">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary-fixed/50 text-on-primary-fixed-variant w-fit">
+              <span class="material-symbols-outlined text-[14px]">edit_note</span>
+              <span class="font-label-sm text-label-sm font-semibold">Lembar Catatan Baru</span>
+            </div>
+            <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight mt-1">Tambah Kartu Tugas</h1>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">Catat detail tugas agar terorganisir rapi di HP</p>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-secondary-fixed/50 flex items-center justify-center text-secondary shrink-0">
+            <span class="material-symbols-outlined text-[24px]">bookmark_add</span>
+          </div>
+        </div>
+        <div class="mt-2 pt-2 flex items-center gap-2 text-on-surface-variant font-body-sm text-[11px]">
+          <span class="material-symbols-outlined text-primary text-[16px]">eco</span>
+          <span>Fokus satu per satu, luangkan istirahat yang cukup.</span>
+        </div>
+      </div>
+
+      <form class="flex flex-col gap-space-lg" id="task-form" onsubmit="event.preventDefault(); saveTask();">
+
+        <!-- Tipe -->
+        <div class="flex flex-col gap-space-sm">
+          <div class="flex items-center justify-between">
+            <label class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-primary text-[18px]">hub</span>
+              <span>Tipe Kolaborasi Tugas</span>
+            </label>
+            <span class="font-label-sm text-label-sm text-primary font-medium">Wajib diisi</span>
+          </div>
+          <div class="grid grid-cols-2 gap-space-sm">
+            <label class="relative flex flex-col p-3 rounded-xl bg-surface-container-low shadow-sm cursor-pointer transition-all duration-200" id="card-individuo">
+              <input checked class="sr-only" name="tipe_tugas" onchange="toggleTipeTugas('individu')" type="radio" value="individu"/>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xl">👤</span>
+                <div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-on-primary" id="check-individuo">
+                  <span class="material-symbols-outlined text-[14px]">check</span>
+                </div>
+              </div>
+              <span class="font-headline-sm text-headline-sm text-on-surface text-[15px] font-semibold">Tugas Mandiri</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 leading-snug">Dikerjakan mandiri tanpa kelompok</span>
+            </label>
+            <label class="relative flex flex-col p-3 rounded-xl bg-surface-container-lowest shadow-sm cursor-pointer transition-all duration-200 opacity-80" id="card-kelompok">
+              <input class="sr-only" name="tipe_tugas" onchange="toggleTipeTugas('kelompok')" type="radio" value="kelompok"/>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xl">👥</span>
+                <div class="w-5 h-5 rounded-full bg-surface-container flex items-center justify-center text-transparent" id="check-kelompok">
+                  <span class="material-symbols-outlined text-[14px]">check</span>
+                </div>
+              </div>
+              <span class="font-headline-sm text-headline-sm text-on-surface text-[15px] font-semibold">Tugas Tim</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 leading-snug">Dikerjakan bersama rekan sekelas</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Detail Akademik -->
+        <div class="flex flex-col gap-space-md p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+          <div class="flex items-center gap-2 pb-1">
+            <div class="w-7 h-7 rounded-lg bg-primary-fixed/40 flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">menu_book</span>
+            </div>
+            <span class="font-headline-sm text-headline-sm text-on-surface">Detail Akademik</span>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="font-label-sm text-label-sm text-on-surface-variant font-medium" for="judul-tugas">Judul Tugas / Proyek</label>
+            <input class="w-full rounded-lg bg-surface-container-low px-3.5 py-3 text-on-surface placeholder:text-on-surface-variant/60 font-body-md text-body-md focus:outline-none focus:bg-surface-container-lowest transition-colors" id="judul-tugas" placeholder="misal: Makalah Analisis Algoritma Greedy" required type="text"/>
+          </div>
+          <div class="grid grid-cols-5 gap-space-sm">
+            <div class="col-span-3 flex flex-col gap-1.5">
+              <label class="font-label-sm text-label-sm text-on-surface-variant font-medium" for="mata-kuliah">Mata Kuliah</label>
+              <div class="relative flex items-center">
+                <input class="w-full rounded-lg bg-surface-container-low pl-3 py-3 pr-8 text-on-surface placeholder:text-on-surface-variant/60 font-body-md text-body-md focus:outline-none focus:bg-surface-container-lowest" id="mata-kuliah" placeholder="misal: Desain Algoritma" type="text"/>
+                <span class="material-symbols-outlined absolute right-2 text-on-surface-variant/60 pointer-events-none text-[18px]">auto_stories</span>
+              </div>
+            </div>
+            <div class="col-span-2 flex flex-col gap-1.5">
+              <label class="font-label-sm text-label-sm text-on-surface-variant font-medium" for="kelas">Kelas / SKS</label>
+              <input class="w-full rounded-lg bg-surface-container-low px-3 py-3 text-on-surface font-body-md text-body-md focus:outline-none focus:bg-surface-container-lowest" id="kelas" type="text" placeholder="IF-3A"/>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="font-label-sm text-label-sm text-on-surface-variant font-medium" for="dosen">Dosen Pengampu</label>
+            <div class="relative flex items-center">
+              <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[18px]">school</span>
+              <input class="w-full rounded-lg bg-surface-container-low pl-10 pr-3 py-3 text-on-surface placeholder:text-on-surface-variant/60 font-body-md text-body-md focus:outline-none focus:bg-surface-container-lowest" id="dosen" placeholder="misal: Dr. Ir. Hendra Gunawan, M.T." type="text"/>
+            </div>
+          </div>
+          <!-- Info Kelompok -->
+          <div class="hidden flex-col gap-space-sm pt-2 bg-secondary-fixed/20 p-3 rounded-lg" id="kelompok-detail">
+            <div class="flex items-center gap-1.5 text-on-secondary-fixed">
+              <span class="material-symbols-outlined text-[18px]">diversity_3</span>
+              <span class="font-label-md text-label-md font-semibold">Konfigurasi Anggota Tim</span>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="font-label-sm text-label-sm text-on-secondary-fixed-variant" for="nama-kelompok">Nomor / Nama Kelompok</label>
+              <input class="w-full rounded-lg bg-surface-container-lowest px-3 py-2.5 text-on-surface placeholder:text-on-surface-variant/50 font-body-sm text-body-sm focus:outline-none" id="nama-kelompok" placeholder="misal: Kelompok 4 (Turing)" type="text"/>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="font-label-sm text-label-sm text-on-secondary-fixed-variant" for="anggota-kelompok">Daftar Anggota Tim (Pisahkan koma)</label>
+              <input class="w-full rounded-lg bg-surface-container-lowest px-3 py-2.5 text-on-surface placeholder:text-on-surface-variant/50 font-body-sm text-body-sm focus:outline-none" id="anggota-kelompok" placeholder="misal: Radit, Aisyah, Farhan, Saya" type="text"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Format -->
+        <div class="flex flex-col gap-space-sm">
+          <div class="flex items-center justify-between">
+            <label class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-primary text-[18px]">snippet_folder</span>
+              <span>Format Berkas / Hasil</span>
+            </label>
+            <span class="font-label-sm text-label-sm text-on-surface-variant" id="format-selected-label">Terpilih: Makalah</span>
+          </div>
+          <div class="flex gap-2 overflow-x-auto pb-1 -mx-margin px-margin">
+            <button class="format-chip shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary text-on-primary shadow-sm transition-all duration-150 active:scale-95" onclick="selectFormat(this,'Makalah')" type="button"><span class="material-symbols-outlined text-[16px]">description</span><span class="font-label-sm text-label-sm">Makalah</span></button>
+            <button class="format-chip shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container-lowest text-on-surface shadow-sm transition-all duration-150 active:scale-95" onclick="selectFormat(this,'Resume')" type="button"><span class="material-symbols-outlined text-[16px]">assignment</span><span class="font-label-sm text-label-sm">Resume</span></button>
+            <button class="format-chip shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container-lowest text-on-surface shadow-sm transition-all duration-150 active:scale-95" onclick="selectFormat(this,'Tulisan Tangan')" type="button"><span class="material-symbols-outlined text-[16px]">draw</span><span class="font-label-sm text-label-sm">Tulisan Tangan</span></button>
+            <button class="format-chip shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container-lowest text-on-surface shadow-sm transition-all duration-150 active:scale-95" onclick="selectFormat(this,'Diketik (PDF)')" type="button"><span class="material-symbols-outlined text-[16px]">picture_as_pdf</span><span class="font-label-sm text-label-sm">Diketik (PDF)</span></button>
+            <button class="format-chip shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container-lowest text-on-surface shadow-sm transition-all duration-150 active:scale-95" onclick="selectFormat(this,'Presentasi / Slide')" type="button"><span class="material-symbols-outlined text-[16px]">slideshow</span><span class="font-label-sm text-label-sm">Presentasi / Slide</span></button>
+            <button class="format-chip shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container-lowest text-on-surface shadow-sm transition-all duration-150 active:scale-95" onclick="selectFormat(this,'Praktikum / Coding')" type="button"><span class="material-symbols-outlined text-[16px]">terminal</span><span class="font-label-sm text-label-sm">Praktikum / Coding</span></button>
+          </div>
+        </div>
+
+        <!-- Poin Pengerjaan -->
+        <div class="flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-tertiary-fixed/60 flex items-center justify-center text-tertiary">
+                <span class="material-symbols-outlined text-[18px]">checklist</span>
+              </div>
+              <div>
+                <h2 class="font-headline-sm text-headline-sm text-on-surface text-[15px]">Poin Pengerjaan</h2>
+                <p class="font-body-sm text-[11px] text-on-surface-variant">Bagi tugas menjadi langkah-langkah terukur</p>
+              </div>
+            </div>
+            <span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant" id="subtask-count">0 poin</span>
+          </div>
+          <div class="flex flex-col gap-2 pt-1" id="checklist-container"></div>
+          <button class="w-full py-2.5 px-3 rounded-lg bg-surface-container-low/70 hover:bg-surface-container-high text-primary font-label-md text-label-md flex items-center justify-center gap-2 transition-colors" onclick="addChecklistItem()" type="button">
+            <span class="material-symbols-outlined text-[18px]">add_task</span>
+            <span>+ Tambah Poin Pengerjaan</span>
+          </button>
+        </div>
+
+        <!-- Tenggat -->
+        <div class="flex flex-col gap-space-md p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-error-container/70 flex items-center justify-center text-error">
+              <span class="material-symbols-outlined text-[18px]">alarm</span>
+            </div>
+            <span class="font-headline-sm text-headline-sm text-on-surface">Tenggat &amp; Penyerahan</span>
+          </div>
+          <div class="grid grid-cols-2 gap-space-sm">
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-sm text-label-sm text-on-surface-variant font-medium" for="deadline-date">Tanggal</label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[16px] pointer-events-none">calendar_today</span>
+                <input class="w-full rounded-lg bg-surface-container-low pl-9 pr-2 py-2.5 text-on-surface font-body-sm text-body-sm focus:outline-none" id="deadline-date" type="date"/>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="font-label-sm text-label-sm text-on-surface-variant font-medium" for="deadline-time">Jam Batas (WIB)</label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[16px] pointer-events-none">schedule</span>
+                <input class="w-full rounded-lg bg-surface-container-low pl-9 pr-2 py-2.5 text-on-surface font-body-sm text-body-sm focus:outline-none" id="deadline-time" type="time" value="23:59"/>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+            <span class="font-body-sm text-[11px] text-on-surface-variant shrink-0">Pilihan cepat:</span>
+            <button class="px-2 py-1 rounded bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-label-sm text-[11px] shrink-0" onclick="setQuickDeadline('hari-ini')" type="button">Hari Ini</button>
+            <button class="px-2 py-1 rounded bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-label-sm text-[11px] shrink-0" onclick="setQuickDeadline('besok')" type="button">Besok Malam</button>
+            <button class="px-2 py-1 rounded bg-surface-container-low hover:bg-surface-container text-on-surface-variant font-label-sm text-[11px] shrink-0" onclick="setQuickDeadline('minggu-depan')" type="button">Minggu Depan</button>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="font-label-sm text-label-sm text-on-surface-variant font-medium" for="tautan-pengumpulan">Tautan Pengumpulan (Classroom / Drive / Spada)</label>
+            <div class="relative flex items-center">
+              <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[18px]">link</span>
+              <input class="w-full rounded-lg bg-surface-container-low pl-10 pr-3 py-3 text-on-surface placeholder:text-on-surface-variant/60 font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest" id="tautan-pengumpulan" placeholder="https://classroom.google.com/..." type="url"/>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <div class="flex items-center justify-between">
+              <label class="font-label-sm text-label-sm text-on-surface-variant font-medium" for="catatan-tugas">Catatan Format &amp; Aturan Khusus</label>
+              <span class="font-label-sm text-[11px] text-on-surface-variant/70">Opsional</span>
+            </div>
+            <textarea class="w-full rounded-lg bg-surface-container-low p-3 text-on-surface placeholder:text-on-surface-variant/60 font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest resize-none" id="catatan-tugas" placeholder="Contoh penamaan file: IF3A_Tugas1_Nama.pdf&#10;Font Times New Roman 12pt, spasi 1.5" rows="3"></textarea>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col gap-space-sm pt-2">
+          <button class="w-full py-3.5 px-space-md rounded-xl bg-primary hover:bg-primary-container text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.98]" type="submit">
+            <span class="material-symbols-outlined text-[20px]">task_alt</span>
+            <span>Simpan Kartu Tugas</span>
+          </button>
+          <button class="w-full py-2.5 px-space-md rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-label-md text-label-md flex items-center justify-center gap-1.5 transition-colors" onclick="confirmReset()" type="button">
+            <span class="material-symbols-outlined text-[18px]">restart_alt</span>
+            <span>Reset Formulir</span>
+          </button>
+          <div class="flex items-center justify-center gap-1.5 py-1 text-on-surface-variant/80">
+            <span class="material-symbols-outlined text-primary text-[15px]">save</span>
+            <span class="font-label-sm text-[11px]">Tersimpan otomatis di browser &amp; penyimpanan HP Anda.</span>
+          </div>
+        </div>
+
+      </form>
+
+      <!-- Toast -->
+      <div class="fixed top-24 left-4 right-4 z-[100] transform -translate-y-20 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-3 p-3.5 rounded-xl bg-primary text-on-primary shadow-xl" id="toast-success">
+        <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[20px]">check_circle</span>
+        </div>
+        <div class="flex flex-col flex-1">
+          <span class="font-label-md text-label-md font-semibold">Tugas Berhasil Disimpan!</span>
+          <span class="font-body-sm text-[11px] opacity-90">Kartu tugas baru siap dipantau di beranda.</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/85 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
+    <div class="h-16 px-margin flex items-center justify-around">
+      <button class="min-w-[44px] min-h-[44px] flex flex-col items-center justify-center gap-0.5 text-on-surface-variant hover:text-primary transition-colors" onclick="showPage('list')" type="button">
+        <span class="material-symbols-outlined text-[22px]">task_alt</span>
+        <span class="font-label-sm text-label-sm">Daftar Tugas</span>
+      </button>
+      <button aria-current="page" class="min-w-[44px] min-h-[44px] -mt-5 flex flex-col items-center justify-center gap-0.5 group" type="button">
+        <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center shadow-[0_4px_12px_rgba(61,104,70,0.2)] text-on-primary">
+          <span class="material-symbols-outlined text-[28px]">add</span>
+        </div>
+        <span class="font-label-sm text-label-sm text-primary">Tambah</span>
+      </button>
+      <button class="min-w-[44px] min-h-[44px] flex flex-col items-center justify-center gap-0.5 text-on-surface-variant hover:text-primary transition-colors" onclick="showPage('stats')" type="button">
+        <span class="material-symbols-outlined text-[22px]">analytics</span>
+        <span class="font-label-sm text-label-sm">Arsip &amp; Statistik</span>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE 3 — DETAIL TUGAS
+══════════════════════════════════════════ -->
+<div class="page" id="page-detail">
+  <header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+    <div class="h-16 px-margin flex items-center justify-between">
+      <div class="flex items-center gap-space-sm">
+        <button aria-label="Kembali" class="min-w-[44px] min-h-[44px] -ml-2 rounded-xl flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors" onclick="showPage('list')" type="button">
+          <span class="material-symbols-outlined text-[22px]">arrow_back</span>
+        </button>
+        <h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Detail Tugas</h1>
+      </div>
+      <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+        <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+      </div>
+    </div>
+  </header>
+  <main class="flex flex-col relative w-full px-margin pt-16 pb-safe bg-surface">
+    <div class="flex flex-col w-full pb-10 space-y-space-lg" id="detail-content"></div>
+  </main>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE 4 — ARSIP & STATISTIK
+══════════════════════════════════════════ -->
+<div class="page" id="page-stats">
+  <header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+    <div class="h-20 px-margin flex items-center justify-between">
+      <div class="flex items-center gap-space-sm">
+        <div class="w-11 h-11 rounded-xl bg-secondary-fixed/50 flex items-center justify-center text-secondary">
+          <span class="material-symbols-outlined text-[24px]">analytics</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Arsip &amp; Statistik</span>
+          <span class="font-label-sm text-[11px] text-on-surface-variant">Ringkasan progres semester</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex flex-col relative w-full px-margin pt-20 pb-28 bg-surface">
+    <div class="flex flex-col w-full gap-space-lg" id="stats-content"></div>
+  </main>
+
+  <nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/85 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
+    <div class="h-16 px-margin flex items-center justify-around">
+      <button class="min-w-[44px] min-h-[44px] flex flex-col items-center justify-center gap-0.5 text-on-surface-variant hover:text-primary transition-colors" onclick="showPage('list')" type="button">
+        <span class="material-symbols-outlined text-[22px]">task_alt</span>
+        <span class="font-label-sm text-label-sm">Daftar Tugas</span>
+      </button>
+      <button class="min-w-[44px] min-h-[44px] -mt-5 flex flex-col items-center justify-center gap-0.5 group" onclick="showPage('create')" type="button">
+        <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center shadow-[0_4px_12px_rgba(61,104,70,0.2)] text-on-primary group-hover:scale-105 transition-transform">
+          <span class="material-symbols-outlined text-[28px]">add</span>
+        </div>
+        <span class="font-label-sm text-label-sm text-on-surface-variant group-hover:text-primary transition-colors">Tambah</span>
+      </button>
+      <button aria-current="page" class="min-w-[44px] min-h-[44px] flex flex-col items-center justify-center gap-0.5 text-primary" type="button">
+        <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1">analytics</span>
+        <span class="font-label-sm text-label-sm">Arsip &amp; Statistik</span>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL — KONFIRMASI HAPUS
+══════════════════════════════════════════ -->
+<div class="fixed inset-0 z-[200] items-end justify-center bg-on-surface/40 backdrop-blur-sm" id="confirm-modal">
+  <div class="w-full max-w-md bg-surface rounded-t-2xl p-6 space-y-4 shadow-2xl">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-error-container flex items-center justify-center text-error flex-shrink-0">
+        <span class="material-symbols-outlined text-[22px]">delete_forever</span>
+      </div>
+      <div>
+        <p class="font-headline-sm text-headline-sm text-on-surface">Hapus Tugas?</p>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">Tindakan ini tidak bisa dibatalkan.</p>
+      </div>
+    </div>
+    <div class="flex gap-3">
+      <button class="flex-1 py-3 rounded-xl bg-surface-container text-on-surface font-label-md text-label-md transition-colors hover:bg-surface-container-high" onclick="closeModal()" type="button">Batal</button>
+      <button class="flex-1 py-3 rounded-xl bg-error text-on-error font-label-md text-label-md transition-colors" id="btn-confirm-delete" type="button">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL — EDIT TUGAS
+══════════════════════════════════════════ -->
+<div class="fixed inset-0 z-[200] items-end justify-center bg-on-surface/40 backdrop-blur-sm" id="edit-modal">
+  <div class="w-full max-w-md bg-surface rounded-t-2xl p-6 space-y-4 shadow-2xl max-h-[80dvh] overflow-y-auto">
+    <div class="flex items-center justify-between">
+      <p class="font-headline-sm text-headline-sm text-on-surface">Edit Tugas</p>
+      <button onclick="closeEditModal()" type="button" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded-full"><span class="material-symbols-outlined text-[20px]">close</span></button>
+    </div>
+    <div class="flex flex-col gap-space-md">
+      <div class="flex flex-col gap-1.5">
+        <label class="font-label-sm text-label-sm text-on-surface-variant font-medium">Judul Tugas</label>
+        <input class="w-full rounded-lg bg-surface-container-low px-3 py-2.5 text-on-surface font-body-sm text-body-sm focus:outline-none" id="edit-title" type="text"/>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="font-label-sm text-label-sm text-on-surface-variant font-medium">Mata Kuliah</label>
+        <input class="w-full rounded-lg bg-surface-container-low px-3 py-2.5 text-on-surface font-body-sm text-body-sm focus:outline-none" id="edit-subject" type="text"/>
+      </div>
+      <div class="grid grid-cols-2 gap-space-sm">
+        <div class="flex flex-col gap-1.5">
+          <label class="font-label-sm text-label-sm text-on-surface-variant font-medium">Tanggal Tenggat</label>
+          <input class="w-full rounded-lg bg-surface-container-low px-3 py-2.5 text-on-surface font-body-sm text-body-sm focus:outline-none" id="edit-date" type="date"/>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="font-label-sm text-label-sm text-on-surface-variant font-medium">Jam</label>
+          <input class="w-full rounded-lg bg-surface-container-low px-3 py-2.5 text-on-surface font-body-sm text-body-sm focus:outline-none" id="edit-time" type="time"/>
+        </div>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="font-label-sm text-label-sm text-on-surface-variant font-medium">Dosen Pengampu</label>
+        <input class="w-full rounded-lg bg-surface-container-low px-3 py-2.5 text-on-surface font-body-sm text-body-sm focus:outline-none" id="edit-dosen" type="text"/>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="font-label-sm text-label-sm text-on-surface-variant font-medium">Tautan Pengumpulan</label>
+        <input class="w-full rounded-lg bg-surface-container-low px-3 py-2.5 text-on-surface font-body-sm text-body-sm focus:outline-none" id="edit-link" type="url" placeholder="https://"/>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="font-label-sm text-label-sm text-on-surface-variant font-medium">Catatan</label>
+        <textarea class="w-full rounded-lg bg-surface-container-low px-3 py-2.5 text-on-surface font-body-sm text-body-sm focus:outline-none resize-none" id="edit-catatan" rows="3"></textarea>
+      </div>
+    </div>
+    <button class="w-full py-3 rounded-xl bg-primary text-on-primary font-label-md text-label-md" onclick="saveEdit()" type="button">Simpan Perubahan</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA LAYER
+// ═══════════════════════════════════════════
+let tasks = [];
+let currentTaskId = null;
+let deleteTargetId = null;
+let selectedFormat = 'Makalah';
+let activeListTab = 'all';
+
+function loadTasks() {
+  try { tasks = JSON.parse(localStorage.getItem('kartututas_v2') || '[]'); }
+  catch(e) { tasks = []; }
+}
+function saveTasks() {
+  localStorage.setItem('kartututas_v2', JSON.stringify(tasks));
+}
+
+// ═══════════════════════════════════════════
+// PAGE NAVIGATION
+// ═══════════════════════════════════════════
+function showPage(page, taskId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  window.scrollTo(0, 0);
+  if (page === 'list') renderList(activeListTab);
+  if (page === 'detail' && taskId) { currentTaskId = taskId; renderDetail(taskId); }
+  if (page === 'stats') renderStats();
+  if (page === 'create') resetForm();
+}
+
+// ═══════════════════════════════════════════
+// RENDER LIST
+// ═══════════════════════════════════════════
+function renderList(filter) {
+  if (filter) activeListTab = filter;
+  else filter = activeListTab;
+
+  const filtered = filter === 'all' ? tasks : tasks.filter(t => t.type === filter);
+
+  // stats
+  const indiv = tasks.filter(t => t.type === 'individual').length;
+  const grp   = tasks.filter(t => t.type === 'group').length;
+  const done  = tasks.filter(t => t.status === 'completed').length;
+  document.getElementById('stat-individu').textContent  = indiv;
+  document.getElementById('stat-kelompok').textContent  = grp;
+  document.getElementById('stat-selesai').textContent   = done;
+
+  // tab labels
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    const tab = btn.getAttribute('data-tab');
+    if (tab === 'all')        btn.textContent = 'Semua (' + tasks.length + ')';
+    else if (tab === 'individual') btn.textContent = '👤 Mandiri (' + indiv + ')';
+    else if (tab === 'group')      btn.textContent = '👥 Tim (' + grp + ')';
+    const isActive = tab === filter;
+    btn.classList.toggle('active', isActive);
+    btn.classList.toggle('bg-surface-container-lowest', isActive);
+    btn.classList.toggle('text-primary', isActive);
+    btn.classList.toggle('shadow-sm', isActive);
+    btn.classList.toggle('text-on-surface-variant', !isActive);
+  });
+
+  const container = document.getElementById('tasksList');
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="flex flex-col items-center justify-center py-16 gap-4">
+        <div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-[36px] text-outline">inbox</span>
+        </div>
+        <div class="text-center">
+          <p class="font-headline-sm text-headline-sm text-on-surface">Belum ada tugas</p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Tekan tombol + untuk menambah tugas pertama</p>
+        </div>
+        <button onclick="showPage('create')" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-md text-label-md" type="button">
+          <span class="material-symbols-outlined text-[18px]">add</span> Tambah Tugas
+        </button>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = '';
+  filtered.forEach(task => {
+    const isGroup     = task.type === 'group';
+    const isCompleted = task.status === 'completed';
+    const isUrgent    = task.status === 'urgent';
+
+    const typeBadge = isGroup
+      ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary-fixed/50 text-on-secondary-fixed-variant font-label-sm text-[11px]"><span class="material-symbols-outlined text-[14px]">groups</span>Tugas Kelompok${task.members?.length ? ' • ' + task.members.length + ' Orang' : ''}</span>`
+      : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-fixed/60 text-on-primary-fixed-variant font-label-sm text-[11px]"><span class="material-symbols-outlined text-[14px]">person</span>Tugas Mandiri</span>`;
+
+    const dateBadge = isCompleted
+      ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-[11px]"><span class="material-symbols-outlined text-[13px]">task_alt</span>Selesai</span>`
+      : isUrgent
+        ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-container font-label-sm text-[11px] font-semibold"><span class="material-symbols-outlined text-[13px]">alarm</span>Mendesak • ${task.date}</span>`
+        : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-[11px]"><span class="material-symbols-outlined text-[13px]">calendar_today</span>${task.date || 'Belum ada tenggat'}</span>`;
+
+    const memberRow = isGroup && task.members?.length
+      ? `<div class="flex items-center gap-2 py-1.5 px-2.5 rounded-lg bg-surface-container-low"><span class="material-symbols-outlined text-secondary text-[16px]">group</span><span class="font-body-sm text-[12px] text-on-surface truncate">${task.members.join(', ')}</span></div>` : '';
+
+    const formatChip = task.format
+      ? `<div class="flex flex-wrap items-center gap-1.5"><span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-[11px]">${task.format}</span></div>` : '';
+
+    const subjectColor = isCompleted ? 'text-outline' : (isGroup ? 'text-secondary' : 'text-primary');
+
+    const completeBtn = isCompleted
+      ? `<button class="complete-btn flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary text-on-primary font-label-sm text-[12px]" onclick="toggleDone('${task.id}',event)" type="button"><span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">check_box</span>Tersimpan</button>`
+      : `<button class="complete-btn flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary-fixed/40 hover:bg-primary-fixed text-primary font-label-sm text-[12px] transition-colors" onclick="toggleDone('${task.id}',event)" type="button"><span class="material-symbols-outlined text-[16px]">check_box_outline_blank</span>Tandai Selesai</button>`;
+
+    const art = document.createElement('article');
+    art.className = `task-card flex flex-col p-space-md rounded-xl ${isCompleted ? 'bg-surface-container-lowest/80 opacity-90' : 'bg-surface-container-lowest'} shadow-sm gap-space-sm transition-all cursor-pointer`;
+    art.setAttribute('data-type', task.type);
+    art.setAttribute('data-status', task.status);
+    art.innerHTML = `
+      <div class="flex items-center justify-between">${typeBadge}${dateBadge}</div>
+      <div class="flex flex-col">
+        <span class="font-label-sm text-[12px] ${subjectColor} font-semibold uppercase tracking-wider">${task.subject || ''}</span>
+        <h3 class="font-headline-sm text-headline-sm text-on-surface mt-0.5 ${isCompleted ? 'line-through text-outline' : ''}">${task.title}</h3>
+      </div>
+      ${formatChip}${memberRow}
+      <div class="flex items-center justify-between pt-1">
+        <div class="flex items-center gap-1.5 text-on-surface-variant">
+          <span class="material-symbols-outlined text-[15px]">school</span>
+          <span class="font-body-sm text-[12px] truncate max-w-[140px]">${task.dosen || 'Dosen Pengampu'}</span>
+        </div>
+        ${completeBtn}
+      </div>`;
+    art.addEventListener('click', e => { if (e.target.closest('.complete-btn')) return; showPage('detail', task.id); });
+    container.appendChild(art);
+  });
+
+  // search
+  document.getElementById('taskSearch').oninput = e => {
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll('.task-card').forEach(card => {
+      card.style.display = card.innerText.toLowerCase().includes(q) ? 'flex' : 'none';
+    });
+  };
+
+  // tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.onclick = () => renderList(btn.getAttribute('data-tab'));
+  });
+}
+
+function toggleDone(id, e) {
+  e.stopPropagation();
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  task.status = task.status === 'completed' ? 'pending' : 'completed';
+  saveTasks();
+  renderList();
+}
+
+// ═══════════════════════════════════════════
+// RENDER DETAIL
+// ═══════════════════════════════════════════
+function renderDetail(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  const isGroup     = task.type === 'group';
+  const isCompleted = task.status === 'completed';
+  const subs        = task.subtasks || [];
+  const doneSubs    = task.completedSubtasks || [];
+  const pct         = subs.length > 0 ? Math.round((doneSubs.length / subs.length) * 100) : 0;
+
+  const memberRows = isGroup && task.members?.length
+    ? task.members.map((m, i) => {
+        const initials = m.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
+        const colors   = ['bg-primary-fixed text-on-primary-fixed','bg-secondary-fixed text-on-secondary-fixed','bg-tertiary-fixed text-on-tertiary-fixed','bg-surface-container text-on-surface-variant'];
+        const rowBg    = i === 0 ? 'bg-surface-container-low' : 'bg-surface-bright';
+        return `<div class="flex items-center gap-space-sm p-2.5 rounded-lg ${rowBg}">
+          <div class="relative w-10 h-10 rounded-full ${colors[i%4]} flex-shrink-0 flex items-center justify-center font-label-md font-bold">
+            ${initials}${i===0?'<span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-primary rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-[10px] text-on-primary">star</span></span>':''}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5">
+              <p class="font-label-md text-label-md text-on-surface font-semibold truncate">${m}</p>
+              ${i===0?'<span class="px-1.5 py-0.5 rounded bg-primary text-on-primary font-label-sm text-[10px] uppercase">Ketua</span>':''}
+            </div>
+          </div>
+        </div>`;
+      }).join('') : '';
+
+  const subtaskItems = subs.map((st, i) => {
+    const done = doneSubs.includes(i);
+    return `<label class="flex items-start gap-3 cursor-pointer select-none">
+      <input ${done?'checked':''} class="task-sub-checkbox mt-0.5 w-5 h-5 rounded accent-primary cursor-pointer" onchange="toggleSubtask('${id}',${i},this)" type="checkbox"/>
+      <span class="font-body-md text-body-md flex-1 leading-tight ${done?'line-through text-on-surface-variant':'text-on-surface'}">${st}</span>
+    </label>`;
+  }).join('');
+
+  const fileSlug = ((task.subject||'TUGAS').toUpperCase().replace(/[^A-Z0-9]/g,'_').substring(0,12)) + '_' + (isGroup ? 'KELOMPOK' : 'MANDIRI');
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="flex items-center justify-between pt-space-xs">
+      <div class="flex items-center gap-space-xs text-on-surface-variant">
+        <span class="material-symbols-outlined text-[18px]">keyboard_backspace</span>
+        <span class="font-label-sm text-label-sm">Daftar Tugas</span>
+      </div>
+      <div class="flex items-center gap-space-xs">
+        <button aria-label="Bagikan" class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant active:scale-95 transition-transform" onclick="shareTask('${id}')" type="button"><span class="material-symbols-outlined text-[19px]">share</span></button>
+        <button aria-label="Edit" class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant active:scale-95 transition-transform" onclick="openEditModal('${id}')" type="button"><span class="material-symbols-outlined text-[19px]">edit</span></button>
+        <button aria-label="Hapus" class="w-9 h-9 rounded-full bg-error-container flex items-center justify-center text-on-error-container active:scale-95 transition-transform" onclick="confirmDelete('${id}')" type="button"><span class="material-symbols-outlined text-[19px]">delete</span></button>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-space-xs">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">
+        <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1">${isGroup?'groups':'person'}</span>
+        ${isGroup?'TUGAS KELOMPOK':'TUGAS MANDIRI'}
+      </span>
+      ${task.kelas?`<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm"><span class="material-symbols-outlined text-[15px]">school</span>${task.kelas}</span>`:''}
+      ${task.format?`<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm"><span class="material-symbols-outlined text-[15px]">article</span>${task.format}</span>`:''}
+    </div>
+
+    <div class="rounded-xl bg-surface-container-lowest p-space-md shadow-md space-y-space-md">
+      <div>
+        <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface leading-snug">${task.title}</h2>
+        ${task.catatan?`<p class="font-body-md text-body-md text-on-surface-variant mt-1">${task.catatan}</p>`:''}
+      </div>
+      ${task.date?`<div class="flex items-center gap-space-sm px-3.5 py-2.5 rounded-lg bg-tertiary-fixed text-on-tertiary-fixed">
+        <span class="material-symbols-outlined text-[22px] text-tertiary" style="font-variation-settings:'FILL' 1">timer</span>
+        <div class="flex flex-col">
+          <span class="font-label-sm text-label-sm font-semibold">Tenggat Pengumpulan</span>
+          <span class="font-body-sm text-body-sm text-on-tertiary-fixed-variant">${task.date} • ${task.time||'23:59'} WIB</span>
+        </div>
+      </div>`:''}
+    </div>
+
+    ${isGroup && memberRows?`
+    <div class="space-y-space-sm">
+      <div class="flex items-center justify-between px-1">
+        <div class="flex items-center gap-space-xs">
+          <span class="material-symbols-outlined text-[20px] text-primary" style="font-variation-settings:'FILL' 1">diversity_3</span>
+          <h3 class="font-headline-sm text-headline-sm text-on-surface">Anggota Kelompok &amp; Peran</h3>
+        </div>
+        <span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant">${task.members.length} Mahasiswa</span>
+      </div>
+      <div class="rounded-xl bg-surface-container-lowest p-space-sm shadow-sm space-y-2">${memberRows}</div>
+    </div>`:''}
+
+    ${task.dosen||task.kelas?`
+    <div class="space-y-space-sm">
+      <div class="flex items-center gap-space-xs px-1">
+        <span class="material-symbols-outlined text-[20px] text-primary" style="font-variation-settings:'FILL' 1">menu_book</span>
+        <h3 class="font-headline-sm text-headline-sm text-on-surface">Informasi Akademik</h3>
+      </div>
+      <div class="rounded-xl bg-surface-container-lowest p-space-md shadow-sm space-y-3">
+        ${task.dosen?`<div class="flex items-start gap-3"><div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary flex-shrink-0"><span class="material-symbols-outlined text-[20px]">badge</span></div><div><p class="font-label-sm text-label-sm text-on-surface-variant">Dosen Pengampu</p><p class="font-label-md text-label-md text-on-surface font-medium">${task.dosen}</p></div></div>`:''}
+        ${task.kelas?`<div class="flex items-start gap-3"><div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-secondary flex-shrink-0"><span class="material-symbols-outlined text-[20px]">meeting_room</span></div><div><p class="font-label-sm text-label-sm text-on-surface-variant">Kelas</p><p class="font-label-md text-label-md text-on-surface font-medium">${task.kelas}</p></div></div>`:''}
+      </div>
+    </div>`:''}
+
+    ${subs.length>0?`
+    <div class="space-y-space-sm">
+      <div class="flex items-center justify-between px-1">
+        <div class="flex items-center gap-space-xs">
+          <span class="material-symbols-outlined text-[20px] text-primary" style="font-variation-settings:'FILL' 1">checklist</span>
+          <h3 class="font-headline-sm text-headline-sm text-on-surface">Ceklis Instruksi Tugas</h3>
+        </div>
+        <span class="font-label-sm text-label-sm text-primary font-semibold" id="checklist-counter">${doneSubs.length} dari ${subs.length} Selesai</span>
+      </div>
+      <div class="rounded-xl bg-surface-container-lowest p-space-md shadow-sm space-y-space-md">
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-center">
+            <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Progres Pengerjaan</span>
+            <span class="font-label-sm text-label-sm text-primary font-bold" id="progress-percent">${pct}% Siap</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-surface-container overflow-hidden">
+            <div class="h-full bg-primary rounded-full transition-all duration-500" id="progress-fill" style="width:${pct}%"></div>
+          </div>
+        </div>
+        <div class="space-y-2.5">${subtaskItems}</div>
+      </div>
+    </div>`:''}
+
+    <div class="space-y-space-sm">
+      <div class="flex items-center gap-space-xs px-1">
+        <span class="material-symbols-outlined text-[20px] text-primary" style="font-variation-settings:'FILL' 1">cloud_upload</span>
+        <h3 class="font-headline-sm text-headline-sm text-on-surface">Pengumpulan Resmi</h3>
+      </div>
+      <div class="rounded-xl bg-surface-container-lowest p-space-md shadow-sm space-y-space-md">
+        <div class="space-y-1.5">
+          <span class="font-label-sm text-label-sm text-on-surface-variant">Standar Penamaan Berkas:</span>
+          <div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low cursor-pointer active:bg-surface-container" onclick="copyFileName('${fileSlug}')">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="material-symbols-outlined text-primary text-[20px]">description</span>
+              <span class="font-label-md text-label-md font-semibold text-on-surface truncate" id="file-name-text">${fileSlug}.pdf</span>
+            </div>
+            <span class="font-label-sm text-label-sm text-primary flex items-center gap-1 flex-shrink-0" id="copy-status">
+              <span class="material-symbols-outlined text-[16px]">content_copy</span> Salin
+            </span>
+          </div>
+        </div>
+        <a class="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm font-semibold shadow-md active:scale-[0.99] transition-transform text-center" href="${task.link||'https://classroom.google.com'}" rel="noopener noreferrer" target="_blank">
+          <span>Buka Tautan Pengumpulan</span>
+          <span class="material-symbols-outlined text-[20px]">north_east</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="sticky bottom-2 z-30 pt-2">
+      <div class="rounded-xl bg-surface-container-lowest/95 backdrop-blur-md p-space-sm shadow-xl flex items-center gap-space-sm">
+        <button class="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg bg-secondary-container text-on-secondary-container font-label-md text-label-md active:scale-95 transition-transform" onclick="shareTask('${id}')" type="button">
+          <span class="material-symbols-outlined text-[18px]">chat</span>
+          <span class="truncate">Kirim ke WhatsApp</span>
+        </button>
+        <button class="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg font-label-md text-label-md active:scale-95 transition-transform ${isCompleted?'bg-primary-container text-on-primary-container':'bg-surface-container text-on-surface'}" id="btn-toggle-done" onclick="toggleDetailDone('${id}')" type="button">
+          <span class="material-symbols-outlined text-[18px]">${isCompleted?'check_circle':'task_alt'}</span>
+          <span class="truncate">${isCompleted?'Sudah Selesai':'Tandai Selesai'}</span>
+        </button>
+      </div>
+    </div>`;
+}
+
+function toggleSubtask(taskId, index, cb) {
+  const task = tasks.find(t => t.id === taskId);
+  if (!task) return;
+  if (!task.completedSubtasks) task.completedSubtasks = [];
+  if (cb.checked) { if (!task.completedSubtasks.includes(index)) task.completedSubtasks.push(index); }
+  else { task.completedSubtasks = task.completedSubtasks.filter(i => i !== index); }
+  saveTasks();
+  const total = task.subtasks.length, done = task.completedSubtasks.length;
+  const pct   = total > 0 ? Math.round((done/total)*100) : 0;
+  const el = id => document.getElementById(id);
+  if (el('checklist-counter')) el('checklist-counter').textContent = done + ' dari ' + total + ' Selesai';
+  if (el('progress-percent')) el('progress-percent').textContent = pct + '% Siap';
+  if (el('progress-fill')) el('progress-fill').style.width = pct + '%';
+  const span = cb.nextElementSibling;
+  if (span) {
+    if (cb.checked) { span.classList.add('line-through','text-on-surface-variant'); span.classList.remove('text-on-surface'); }
+    else { span.classList.remove('line-through','text-on-surface-variant'); span.classList.add('text-on-surface'); }
+  }
+}
+
+function toggleDetailDone(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  task.status = task.status === 'completed' ? 'pending' : 'completed';
+  saveTasks();
+  renderDetail(id);
+}
+
+function copyFileName(slug) {
+  const text = slug + '.pdf';
+  navigator.clipboard.writeText(text).then(() => {
+    const el = document.getElementById('copy-status');
+    if (el) { el.innerHTML = '<span class="material-symbols-outlined text-[16px]">done</span> Tersalin!'; setTimeout(() => { el.innerHTML = '<span class="material-symbols-outlined text-[16px]">content_copy</span> Salin'; }, 2000); }
+  }).catch(() => alert('Nama file: ' + text));
+}
+
+function shareTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  const text = `📚 Pengingat Tugas\n*${task.title}*\nMata Kuliah: ${task.subject||'-'}\nTenggat: ${task.date||'-'} pukul ${task.time||'23:59'} WIB\nFormat: ${task.format||'-'}`;
+  if (navigator.share) navigator.share({ title: task.title, text });
+  else window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(text), '_blank');
+}
+
+// ═══════════════════════════════════════════
+// KONFIRMASI HAPUS
+// ═══════════════════════════════════════════
+function confirmDelete(id) {
+  deleteTargetId = id;
+  document.getElementById('confirm-modal').classList.add('show');
+  document.getElementById('btn-confirm-delete').onclick = () => {
+    tasks = tasks.filter(t => t.id !== deleteTargetId);
+    saveTasks();
+    closeModal();
+    showPage('list');
+  };
+}
+function closeModal() {
+  document.getElementById('confirm-modal').classList.remove('show');
+  deleteTargetId = null;
+}
+document.getElementById('confirm-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('confirm-modal')) closeModal();
+});
+
+// ═══════════════════════════════════════════
+// EDIT MODAL
+// ═══════════════════════════════════════════
+function openEditModal(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  document.getElementById('edit-title').value   = task.title || '';
+  document.getElementById('edit-subject').value = task.subject || '';
+  document.getElementById('edit-date').value    = task.date || '';
+  document.getElementById('edit-time').value    = task.time || '23:59';
+  document.getElementById('edit-dosen').value   = task.dosen || '';
+  document.getElementById('edit-link').value    = task.link || '';
+  document.getElementById('edit-catatan').value = task.catatan || '';
+  document.getElementById('edit-modal').classList.add('show');
+  document.getElementById('edit-modal').dataset.taskId = id;
+}
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('show');
+}
+function saveEdit() {
+  const id = document.getElementById('edit-modal').dataset.taskId;
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  task.title   = document.getElementById('edit-title').value.trim();
+  task.subject = document.getElementById('edit-subject').value.trim();
+  task.date    = document.getElementById('edit-date').value;
+  task.time    = document.getElementById('edit-time').value;
+  task.dosen   = document.getElementById('edit-dosen').value.trim();
+  task.link    = document.getElementById('edit-link').value.trim();
+  task.catatan = document.getElementById('edit-catatan').value.trim();
+  saveTasks();
+  closeEditModal();
+  renderDetail(id);
+}
+document.getElementById('edit-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('edit-modal')) closeEditModal();
+});
+
+// ═══════════════════════════════════════════
+// RENDER STATISTIK
+// ═══════════════════════════════════════════
+function renderStats() {
+  const container = document.getElementById('stats-content');
+  const total     = tasks.length;
+  const done      = tasks.filter(t => t.status === 'completed').length;
+  const pending   = tasks.filter(t => t.status !== 'completed').length;
+  const indiv     = tasks.filter(t => t.type === 'individual').length;
+  const grp       = tasks.filter(t => t.type === 'group').length;
+  const pct       = total > 0 ? Math.round((done/total)*100) : 0;
+
+  // Tugas per Mata Kuliah
+  const bySubject = {};
+  tasks.forEach(t => {
+    const key = t.subject || 'Tanpa Mata Kuliah';
+    if (!bySubject[key]) bySubject[key] = { total: 0, done: 0 };
+    bySubject[key].total++;
+    if (t.status === 'completed') bySubject[key].done++;
+  });
+
+  // Arsip (selesai)
+  const completedTasks = tasks.filter(t => t.status === 'completed');
+
+  if (total === 0) {
+    container.innerHTML = `
+      <div class="flex flex-col items-center justify-center py-20 gap-4">
+        <div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-[36px] text-outline">insert_chart</span>
+        </div>
+        <div class="text-center">
+          <p class="font-headline-sm text-headline-sm text-on-surface">Belum ada data statistik</p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Tambah tugas terlebih dahulu untuk melihat statistik</p>
+        </div>
+        <button onclick="showPage('create')" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary font-label-md text-label-md" type="button">
+          <span class="material-symbols-outlined text-[18px]">add</span> Tambah Tugas Pertama
+        </button>
+      </div>`;
+    return;
+  }
+
+  const subjectBars = Object.entries(bySubject).map(([subj, data]) => {
+    const pctSubj = Math.round((data.done/data.total)*100);
+    return `
+      <div class="flex flex-col gap-1">
+        <div class="flex items-center justify-between">
+          <span class="font-label-sm text-label-sm text-on-surface truncate max-w-[65%]">${subj}</span>
+          <span class="font-label-sm text-[11px] text-on-surface-variant">${data.done}/${data.total} selesai</span>
+        </div>
+        <div class="w-full h-2 rounded-full bg-surface-container overflow-hidden">
+          <div class="h-full bg-primary rounded-full transition-all duration-700" style="width:${pctSubj}%"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  const archivedCards = completedTasks.length > 0
+    ? completedTasks.map(task => `
+        <div class="flex items-start gap-3 p-3 rounded-lg bg-surface-container-lowest">
+          <div class="w-8 h-8 rounded-lg bg-primary-fixed flex items-center justify-center text-primary flex-shrink-0 mt-0.5">
+            <span class="material-symbols-outlined text-[18px]">task_alt</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-label-md text-label-md text-on-surface font-semibold truncate">${task.title}</p>
+            <p class="font-body-sm text-[11px] text-on-surface-variant mt-0.5">${task.subject||'-'} • Tenggat ${task.date||'-'}</p>
+          </div>
+          <button onclick="unarchive('${task.id}')" class="text-on-surface-variant hover:text-primary p-1 rounded-lg hover:bg-surface-container transition-colors" title="Aktifkan kembali" type="button">
+            <span class="material-symbols-outlined text-[18px]">restart_alt</span>
+          </button>
+        </div>`).join('')
+    : `<div class="py-8 text-center text-on-surface-variant font-body-sm text-body-sm">Belum ada tugas yang selesai</div>`;
+
+  container.innerHTML = `
+    <!-- Ringkasan Utama -->
+    <section class="flex flex-col gap-space-sm p-space-md rounded-xl bg-surface-container-lowest shadow-sm relative overflow-hidden">
+      <div class="absolute -right-4 -top-4 w-20 h-20 rounded-full bg-primary-fixed/20 blur-xl pointer-events-none"></div>
+      <div class="flex items-center gap-2 mb-1">
+        <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings:'FILL' 1">bar_chart</span>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface">Ringkasan Semester</h2>
+      </div>
+      <div class="space-y-2">
+        <div class="flex justify-between items-center">
+          <span class="font-label-sm text-label-sm text-on-surface-variant">Progress Keseluruhan</span>
+          <span class="font-label-sm text-label-sm text-primary font-bold">${pct}%</span>
+        </div>
+        <div class="w-full h-3 rounded-full bg-surface-container overflow-hidden">
+          <div class="h-full bg-primary rounded-full transition-all duration-700" style="width:${pct}%"></div>
+        </div>
+        <p class="font-body-sm text-[11px] text-on-surface-variant">${done} dari ${total} tugas telah diselesaikan</p>
+      </div>
+    </section>
+
+    <!-- Grid Stats -->
+    <div class="grid grid-cols-2 gap-space-sm">
+      <div class="flex flex-col gap-1 p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+        <div class="w-8 h-8 rounded-lg bg-primary-fixed/50 flex items-center justify-center text-primary mb-1">
+          <span class="material-symbols-outlined text-[18px]">pending_actions</span>
+        </div>
+        <span class="font-headline-sm text-headline-sm text-on-surface">${pending}</span>
+        <span class="font-label-sm text-[12px] text-on-surface-variant">Belum Selesai</span>
+      </div>
+      <div class="flex flex-col gap-1 p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+        <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary mb-1">
+          <span class="material-symbols-outlined text-[18px]">done_all</span>
+        </div>
+        <span class="font-headline-sm text-headline-sm text-primary">${done}</span>
+        <span class="font-label-sm text-[12px] text-on-surface-variant">Telah Selesai</span>
+      </div>
+      <div class="flex flex-col gap-1 p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+        <div class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-on-surface-variant mb-1">
+          <span class="material-symbols-outlined text-[18px]">person</span>
+        </div>
+        <span class="font-headline-sm text-headline-sm text-on-surface">${indiv}</span>
+        <span class="font-label-sm text-[12px] text-on-surface-variant">Tugas Individu</span>
+      </div>
+      <div class="flex flex-col gap-1 p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+        <div class="w-8 h-8 rounded-lg bg-secondary-fixed/40 flex items-center justify-center text-secondary mb-1">
+          <span class="material-symbols-outlined text-[18px]">groups</span>
+        </div>
+        <span class="font-headline-sm text-headline-sm text-secondary">${grp}</span>
+        <span class="font-label-sm text-[12px] text-on-secondary-container">Tugas Kelompok</span>
+      </div>
+    </div>
+
+    <!-- Per Mata Kuliah -->
+    ${Object.keys(bySubject).length > 0 ? `
+    <section class="flex flex-col gap-space-md p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings:'FILL' 1">auto_stories</span>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface">Progress per Mata Kuliah</h2>
+      </div>
+      <div class="flex flex-col gap-space-md">${subjectBars}</div>
+    </section>` : ''}
+
+    <!-- Arsip Tugas Selesai -->
+    <section class="flex flex-col gap-space-md">
+      <div class="flex items-center justify-between px-1">
+        <div class="flex items-center gap-space-xs">
+          <span class="material-symbols-outlined text-[20px] text-primary" style="font-variation-settings:'FILL' 1">inventory_2</span>
+          <h2 class="font-headline-sm text-headline-sm text-on-surface">Arsip Tugas Selesai</h2>
+        </div>
+        <span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant">${completedTasks.length} tugas</span>
+      </div>
+      <div class="rounded-xl bg-surface-container-lowest shadow-sm p-space-sm space-y-2">
+        ${archivedCards}
+        ${completedTasks.length > 0 ? `
+        <div class="pt-2">
+          <button onclick="confirmClearArchive()" class="w-full py-2.5 rounded-lg bg-error-container/40 hover:bg-error-container text-error font-label-md text-label-md flex items-center justify-center gap-2 transition-colors" type="button">
+            <span class="material-symbols-outlined text-[18px]">delete_sweep</span>
+            Hapus Semua Arsip
+          </button>
+        </div>` : ''}
+      </div>
+    </section>
+
+    <!-- Tip -->
+    <section class="flex items-center gap-space-sm p-space-sm rounded-xl bg-surface-container-low text-on-surface-variant">
+      <div class="w-8 h-8 rounded-lg bg-secondary-fixed/40 flex items-center justify-center text-secondary flex-shrink-0">
+        <span class="material-symbols-outlined text-[18px]">lightbulb</span>
+      </div>
+      <p class="font-body-sm text-[12px] leading-snug">
+        <span class="font-semibold text-on-surface">Tips:</span> Selesaikan tugas paling berat lebih dahulu untuk menjaga momentum belajar.
+      </p>
+    </section>`;
+}
+
+function unarchive(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  task.status = 'pending';
+  saveTasks();
+  renderStats();
+}
+
+function confirmClearArchive() {
+  if (!confirm('Hapus semua tugas yang sudah selesai dari arsip?')) return;
+  tasks = tasks.filter(t => t.status !== 'completed');
+  saveTasks();
+  renderStats();
+}
+
+// ═══════════════════════════════════════════
+// FORM HELPERS
+// ═══════════════════════════════════════════
+function resetForm() {
+  document.getElementById('task-form').reset();
+  document.getElementById('checklist-container').innerHTML = '';
+  document.getElementById('subtask-count').textContent = '0 poin';
+  selectedFormat = 'Makalah';
+  document.getElementById('format-selected-label').textContent = 'Terpilih: Makalah';
+  document.querySelectorAll('.format-chip').forEach((c,i) => {
+    c.className = i===0
+      ? 'format-chip shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary text-on-primary shadow-sm transition-all duration-150 active:scale-95'
+      : 'format-chip shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container-lowest text-on-surface shadow-sm transition-all duration-150 active:scale-95';
+  });
+  toggleTipeTugas('individu');
+}
+
+function saveTask() {
+  const judul = document.getElementById('judul-tugas').value.trim();
+  if (!judul) return;
+  const isGroup = document.querySelector('input[name="tipe_tugas"]:checked')?.value === 'kelompok';
+  const anggotaRaw = document.getElementById('anggota-kelompok').value;
+  const newTask = {
+    id: 'task_' + Date.now(),
+    title: judul,
+    subject: document.getElementById('mata-kuliah').value.trim(),
+    kelas: document.getElementById('kelas').value.trim(),
+    dosen: document.getElementById('dosen').value.trim(),
+    date: document.getElementById('deadline-date').value,
+    time: document.getElementById('deadline-time').value,
+    type: isGroup ? 'group' : 'individual',
+    format: selectedFormat,
+    status: 'pending',
+    kelompok: isGroup ? document.getElementById('nama-kelompok').value.trim() : '',
+    members: isGroup ? anggotaRaw.split(',').map(s=>s.trim()).filter(Boolean) : [],
+    link: document.getElementById('tautan-pengumpulan').value.trim(),
+    catatan: document.getElementById('catatan-tugas').value.trim(),
+    subtasks: Array.from(document.querySelectorAll('#checklist-container input[type="text"]')).map(i=>i.value.trim()).filter(Boolean),
+    completedSubtasks: []
+  };
+  tasks.unshift(newTask);
+  saveTasks();
+
+  // show toast
+  const toast = document.getElementById('toast-success');
+  toast.classList.remove('-translate-y-20','opacity-0','pointer-events-none');
+  toast.classList.add('translate-y-0','opacity-100');
+  setTimeout(() => {
+    toast.classList.add('-translate-y-20','opacity-0','pointer-events-none');
+    toast.classList.remove('translate-y-0','opacity-100');
+    showPage('list');
+  }, 2200);
+}
+
+function toggleTipeTugas(tipe) {
+  const cI = document.getElementById('card-individuo');
+  const cK = document.getElementById('card-kelompok');
+  const xI = document.getElementById('check-individuo');
+  const xK = document.getElementById('check-kelompok');
+  const kD = document.getElementById('kelompok-detail');
+  if (!cI) return;
+  if (tipe === 'kelompok') {
+    cK.classList.remove('opacity-80'); cK.classList.add('bg-surface-container-low');
+    cI.classList.add('opacity-80'); cI.classList.remove('bg-surface-container-low');
+    xK.className = 'w-5 h-5 rounded-full bg-secondary flex items-center justify-center text-on-secondary';
+    xI.className = 'w-5 h-5 rounded-full bg-surface-container flex items-center justify-center text-transparent';
+    kD.classList.remove('hidden'); kD.classList.add('flex');
+  } else {
+    cI.classList.remove('opacity-80'); cI.classList.add('bg-surface-container-low');
+    cK.classList.add('opacity-80'); cK.classList.remove('bg-surface-container-low');
+    xI.className = 'w-5 h-5 rounded-full bg-primary flex items-center justify-center text-on-primary';
+    xK.className = 'w-5 h-5 rounded-full bg-surface-container flex items-center justify-center text-transparent';
+    kD.classList.add('hidden'); kD.classList.remove('flex');
+  }
+}
+
+function selectFormat(btn, name) {
+  selectedFormat = name;
+  document.querySelectorAll('.format-chip').forEach(c => {
+    c.className = 'format-chip shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container-lowest text-on-surface shadow-sm transition-all duration-150 active:scale-95';
+  });
+  btn.className = 'format-chip shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary text-on-primary shadow-sm transition-all duration-150 active:scale-95';
+  document.getElementById('format-selected-label').textContent = 'Terpilih: ' + name;
+}
+
+function addChecklistItem() {
+  const container = document.getElementById('checklist-container');
+  const count = container.querySelectorAll('.checklist-item').length + 1;
+  const div = document.createElement('div');
+  div.className = 'checklist-item flex items-center gap-2.5 p-2 rounded-lg bg-surface-container-low';
+  div.innerHTML = `
+    <span class="material-symbols-outlined text-primary text-[18px]">drag_indicator</span>
+    <span class="w-5 h-5 rounded-md bg-surface-container-lowest flex items-center justify-center text-[11px] font-bold text-on-surface-variant">${count}</span>
+    <input type="text" placeholder="Tulis langkah pengerjaan..." class="flex-1 bg-transparent text-on-surface font-body-sm text-body-sm focus:outline-none"/>
+    <button type="button" onclick="removeChecklistItem(this)" class="w-7 h-7 rounded-md flex items-center justify-center text-outline hover:text-error hover:bg-error-container/40 transition-colors">
+      <span class="material-symbols-outlined text-[18px]">delete</span>
+    </button>`;
+  container.appendChild(div);
+  div.querySelector('input').focus();
+  updateChecklistIndices();
+}
+
+function removeChecklistItem(btn) {
+  btn.closest('.checklist-item').remove();
+  updateChecklistIndices();
+}
+
+function updateChecklistIndices() {
+  const items = document.querySelectorAll('#checklist-container .checklist-item');
+  items.forEach((item, i) => {
+    const badge = item.querySelectorAll('span')[1];
+    if (badge) badge.textContent = i + 1;
+  });
+  document.getElementById('subtask-count').textContent = items.length + ' poin';
+}
+
+function setQuickDeadline(type) {
+  const d = new Date();
+  if (type === 'besok') d.setDate(d.getDate() + 1);
+  else if (type === 'minggu-depan') d.setDate(d.getDate() + 7);
+  document.getElementById('deadline-date').value = d.toISOString().split('T')[0];
+}
+
+function confirmReset() {
+  if (confirm('Reset semua isian formulir?')) resetForm();
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+loadTasks();
+renderList();
+</script>
+</body>
+</html>
