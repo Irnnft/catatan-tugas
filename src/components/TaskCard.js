@@ -39,7 +39,7 @@ export default function TaskCard({ task, onToggleDone, onDelete }) {
 
   return (
     <article className={`flex flex-col p-space-md rounded-xl shadow-sm gap-space-sm transition-all ${isCompleted ? 'bg-surface-container-lowest/80 opacity-90' : 'bg-surface-container-lowest'}`}>
-      <Link href={`/detail/${task.id}`} className="flex flex-col gap-space-sm">
+      <Link href={`/detail?id=${task.id}`} className="flex flex-col gap-space-sm">
         <div className="flex items-center justify-between">
           {typeBadge}
           {dateBadge}
