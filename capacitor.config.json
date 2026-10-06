@@ -1,0 +1,6 @@
+{
+  "appId": "com.catatantugas.app",
+  "appName": "Catatan Tugas",
+  "webDir": "out",
+  "bundledWebRuntime": false
+}

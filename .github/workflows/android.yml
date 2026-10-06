@@ -32,8 +32,8 @@ jobs:
 
       - name: Initialize Capacitor & Add Android
         run: |
-          npx cap init "Catatan Tugas" "com.catatantugas.app" --web-dir out
           npx cap add android
+          npx cap sync android
           npx cap sync android
 
       - name: Setup Java
